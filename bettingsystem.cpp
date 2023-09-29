@@ -1,0 +1,1 @@
+/*keep track of bets while going through the various hands*/

@@ -1,99 +1,59 @@
-/* go down the hand strenghts from Straight flush to high card
-*/
-using namespace std;
-#include <array>
-#include <bits/stdc++.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <cstdlib>
-#include <iostream>
-#include <string>
+#include "pokerhand.cpp"
 
-const string ranks = "23456789TJQKA";
-const string suits = "CDHS";
+class CombinedHand {
+	public:
+	Card* combinedcards[7];  // Array for holding 2 cards
 
-// Function to evaluate a poker hand
-string evaluatePokerHand(const vector<string>& playerHand,
-                         const vector<string>& communityCards) {
-  // Combine player's hole cards and community cards
-  vector<string> combinedHand = playerHand;
-  combinedHand.insert(combinedHand.end(), communityCards.begin(),
-                      communityCards.end());
+	CombinedHand() {
+	// Initialize the player with empty cards
+		for (int k = 0; k < 7; k++) {
+			combinedcards[k] = nullptr;
+		}
+	}
+};
 
-  // Sort the combined hand by rank
-  sort(combinedHand.begin(), combinedHand.end(),
-       [](const string& a, const string& b) {
-         return ranks.find(a[0]) < ranks.find(b[0]);
-       });
+CombinedHand Combine(Table table, Player player) {
+	CombinedHand ch = CombinedHand();
 
-  // Count the frequency of each rank
-  map<char, int> rankCount;
-  for (const string& card : combinedHand) {
-    rankCount[card[0]]++;
-  }
-
-  // Check for specific hand combinations
-  bool isFlush = true;
-  bool isStraight = true;
-
-  // Check for flush
-  for (int i = 1; i < 7; ++i) {
-    if (combinedHand[i][1] != combinedHand[0][1]) {
-      isFlush = false;
-      break;
-    }
-  }
-
-  // Check for straight
-  for (int i = 1; i < 7; ++i) {
-    if (ranks.find(combinedHand[i][0]) !=
-        ranks.find(combinedHand[i - 1][0]) + 1) {
-      isStraight = false;
-      break;
-    }
-  }
-
-  // Evaluate the hand based on the highest possible combination
-  if (isFlush && isStraight) {
-    return "Straight Flush";
-  } else if (rankCount.rbegin()->second == 4) {
-    return "Four of a Kind";
-  } else if (rankCount.rbegin()->second == 3 &&
-             next(rankCount.rbegin())->second == 2) {
-    return "Full House";
-  } else if (isFlush) {
-    return "Flush";
-  } else if (isStraight) {
-    return "Straight";
-  } else if (rankCount.rbegin()->second == 3) {
-    return "Three of a Kind";
-  } else if (rankCount.rbegin()->second == 2 && rankCount.size() == 3) {
-    return "Two Pair";
-  } else if (rankCount.rbegin()->second == 2) {
-    return "One Pair";
-  } else {
-    return "High Card";
-  }
+	for (int i = 0; i < 7; i++) {
+		if (i < 2) {
+		    ch.combinedcards[i] = player.playercards[i];
+		} else {
+		    ch.combinedcards[i] = table.tablecards[i - 2];
+		}
+	}
+	//CardSort(combinedhand.combinedcards)
+	//cout << ch.combinedcards[0]->name << endl;
+	return ch;
 }
 
 int main() {
-  // Example player's hole cards and community cards
-  vector<string> playerHand = {"AC", "AD"};
-  vector<string> communityCards = {"2H", "3D", "4S", "5C", "6H"};
+	Deck deck = Deck();
+	for (int i = 0; i < 52; i++) {
+		cout << deck.cards[i]->name << endl;
+	}
+	cout << "\n\n\n\n";
 
-  // Evaluate the player's hand
-  string result = evaluatePokerHand(playerHand, communityCards);
+	vector<Player> playerlist;
+	int num_players = 3;
+	for (int i = 0; i < num_players; i++) {
+		playerlist.push_back(Player());
+	}
+	playerlist = Deal(deck, playerlist);   
+    cout << "\n" << endl;
 
-  // Output the result
-  cout << "Player's Hole Cards: " << playerHand[0] << " " << playerHand[1]
-       << endl;
-  cout << "Community Cards: ";
-  for (const string& card : communityCards) {
-    cout << card << " ";
-  }
-  cout << endl;
-  cout << "Hand Rank: " << result << endl;
+    Table table = Table(deck);
+    cout << table.tablecards[0]->name << endl;
+    cout << table.tablecards[1]->name << endl;
+    cout << table.tablecards[2]->name << endl;
+    cout << table.tablecards[3]->name << endl;
+    cout << table.tablecards[4]->name << endl;
+    cout << "\n" << endl;
 
-  return 0;
+    CombinedHand ch = CombinedHand();
+    ch = Combine(table, playerlist[0]);
+    for (int i = 0; i < 7; i++) {
+        cout << ch.combinedcards[i]->name << endl;
+	}
+	//cout << ch.combinedcards[0]->name << endl;
 }

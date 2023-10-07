@@ -1,31 +1,5 @@
-#include "pokerhand.cpp"
-
-class CombinedHand {
-	public:
-	Card* combinedcards[7];  // Array for holding 2 cards
-
-	CombinedHand() {
-	// Initialize the player with empty cards
-		for (int k = 0; k < 7; k++) {
-			combinedcards[k] = nullptr;
-		}
-	}
-};
-
-CombinedHand Combine(Table table, Player player) {
-	CombinedHand ch = CombinedHand();
-
-	for (int i = 0; i < 7; i++) {
-		if (i < 2) {
-		    ch.combinedcards[i] = player.playercards[i];
-		} else {
-		    ch.combinedcards[i] = table.tablecards[i - 2];
-		}
-	}
-	//CardSort(combinedhand.combinedcards)
-	//cout << ch.combinedcards[0]->name << endl;
-	return ch;
-}
+#include "pokerhand.h"
+#include "HandEval.h"
 
 int main() {
 	Deck deck = Deck();
@@ -42,7 +16,7 @@ int main() {
 	playerlist = Deal(deck, playerlist);   
     cout << "\n" << endl;
 
-    Table table = Table(deck);
+    Table table = Table(deck, num_players*2);
     cout << table.tablecards[0]->name << endl;
     cout << table.tablecards[1]->name << endl;
     cout << table.tablecards[2]->name << endl;
@@ -56,4 +30,13 @@ int main() {
         cout << ch.combinedcards[i]->name << endl;
 	}
 	//cout << ch.combinedcards[0]->name << endl;
+    
+    vector<int> result = Quantity(ch);
+
+    // Check the size of the result vector to determine how many values to display
+    int resultSize = result.size();
+    for (int i = 0; i < resultSize; i++) {
+    cout << result[i] << " ";
+    }
+    cout << endl;  
 }

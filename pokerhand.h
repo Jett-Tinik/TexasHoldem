@@ -36,7 +36,7 @@ struct Card {
 		}
 		this->value = value;
 
-		// name logic ---> checked above --> use hash map for this
+		// name logic ---> checked above --> use hash map for this ll
 		string nums[13] = {"Two", "Three", "Four", "Five", "Six",
 							"Seven", "Eight", "Nine", "Ten", "Jack",
 							"Queen", "King", "Ace"};
@@ -86,7 +86,7 @@ class Deck{
 	}
 
   // TODO: Make a deal function
-  // Card deal() { return; }
+  // Card deal() { return; }  
 	private:
 		int position;
 };

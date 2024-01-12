@@ -21,12 +21,8 @@ map<string, int> card_vals = {
 };
 
 // Function to evaluate the quantity of ranks and strength of the hand
-vector<int> Quantity(CombinedHand hand) {
-    int rank_array[13] = {0}; // Two to Ace
-    for (int i = 0; i < 7; i++) {
-        rank_array[card_vals[hand.combinedcards[i]->rank] - 2]++;
-    }
-
+vector<int> is_flush(CombinedHand hand) {
+    vector<int> result;
     // Check for a flush
     int hearts = 0;
     int spades = 0;
@@ -42,21 +38,36 @@ vector<int> Quantity(CombinedHand hand) {
         if (hand.combinedcards[i]->suit == "Clubs")
             clubs++;
     }
-    bool isFlush = max({hearts, spades, diamonds, clubs}) >= 5;
-    if (isFlush)
-        return vector<int>{6};          
+    string flushtype = "";
+    
+    if(hearts>=5)
+    flushtype +="Hearts";
+    if(spades>=5)
+    flushtype +="Spades";
+    if(diamonds>=5)
+    flushtype +="Diamonds";
+    if(clubs>=5)
+    flushtype +="Clubs";
 
-    // Check for a straight
-    for (int i = 0; i < 9; i++) { // Start from index 0 to 8
-        bool isStraight = true;
-        for (int j = i; j < i + 5; j++) {
-            if (rank_array[j] == 0) {
-                isStraight = false;
-                break;
+    int flushHighRank = 0;
+
+    if(flushtype!=""){
+        // Loop through the cards to find the highest rank in the flush
+        for (int i = 0; i < 7; i++) {
+            if ((hand.combinedcards[i]->suit == flushtype) &&
+                (card_vals[hand.combinedcards[i]->rank] > flushHighRank)) {
+                flushHighRank = card_vals[hand.combinedcards[i]->rank];
             }
         }
-        if (isStraight)
-            return vector<int>{5, i + 6}; // Straight
+        result = {6, flushHighRank}; // Flush with the highest rank in the flush
+    }
+    return result;
+}
+
+vector<int> combinations(CombinedHand hand) {
+    int rank_array[13] = {0}; // Two to Ace
+    for (int i = 0; i < 7; i++) {
+        rank_array[card_vals[hand.combinedcards[i]->rank] - 2]++;
     }
 
     int maxRank = *max_element(rank_array, rank_array + 13);
@@ -78,24 +89,31 @@ vector<int> Quantity(CombinedHand hand) {
         else
             return vector<int>{4, tripsRank}; // Three of a Kind
     } else if (maxRank == 2) {
-    int highPairRank = -1;
-    int lowPairRank = -1;
-    for (int i = 12; i >= 0; i--) {
-        if (rank_array[i] == 2) {
-            if (highPairRank == -1) {
-                highPairRank = i + 2;
-            } else if (lowPairRank == -1) {
-                lowPairRank = i + 2;
-                break; // Exit the loop after finding the second pair (no three pair)
+        int highPairRank = -1;
+        int lowPairRank = -1;
+        for (int i = 12; i >= 0; i--) {
+            if (rank_array[i] == 2) {
+                if (highPairRank == -1) {
+                    highPairRank = i + 2;
+                } else if (lowPairRank == -1) {
+                    lowPairRank = i + 2;
+                    break; // Exit the loop after finding the second pair (no three pair)
+                }
             }
         }
+        if (highPairRank != -1 && lowPairRank != -1)
+            return vector<int>{3, highPairRank, lowPairRank}; // Two Pair
     }
-    if (highPairRank != -1 && lowPairRank != -1)
-        return vector<int>{3, highPairRank, lowPairRank}; // Two Pair
-    else
-        return vector<int>{2, rank_location}; // One Pair
-    } else {
-        // For High Card, find the highest rank among the cards
+    return vector<int>{2, rank_location}; // One Pair
+}
+
+vector<int> high_card(CombinedHand hand) {
+    int rank_array[13] = {0}; // Two to Ace
+    for (int i = 0; i < 7; i++) {
+        rank_array[card_vals[hand.combinedcards[i]->rank] - 2]++;
+    }
+
+    // For High Card, find the highest rank among the cards
     int highCardRank = -1;
     for (int i = 12; i >= 0; i--) {
         if (rank_array[i] > 0) {
@@ -103,9 +121,40 @@ vector<int> Quantity(CombinedHand hand) {
             break; // Exit the loop after finding the highest rank
          }
     }
-        return vector<int>{1, highCardRank}; // High Card
-    }
+    return vector<int>{1, highCardRank}; // High Card
 }
+
+vector<int> is_straight(CombinedHand hand) {
+    vector<int> result;
+
+    // Check for a straight
+    int rank_array[13] = {0}; // Two to Ace
+    for (int i = 0; i < 7; i++) {
+        rank_array[card_vals[hand.combinedcards[i]->rank] - 2]++;
+    }
+
+    // Check for the Ace to 5 straight
+    if (rank_array[12] && rank_array[0] && rank_array[1] && rank_array[2] && rank_array[3]) {
+        return {5, 5}; // Ace to 5 straight
+    }
+
+    // Check for other straights
+    for (int i = 0; i <= 8; i++) { // Start from index 0 to 8
+        bool isStraight = true;
+        for (int j = i; j < i + 5; j++) {
+            if (rank_array[j % 13] == 0 || (j % 13 == 12 && rank_array[0] == 0)) {
+                isStraight = false;
+                break;
+            }
+        }
+        if (isStraight) {
+            result = {5, i + 6}; // Straight
+            break; // Exit loop once a straight is found
+        }
+    }
+    return result;
+}
+
 
 //#include "pokerhand.h"
 

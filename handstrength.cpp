@@ -16,6 +16,7 @@ int main() {
 	playerlist = Deal(deck, playerlist);   
     cout << "\n" << endl;
 
+
     Table table = Table(deck, num_players*2);
     cout << table.tablecards[0]->name << endl;
     cout << table.tablecards[1]->name << endl;
@@ -24,19 +25,34 @@ int main() {
     cout << table.tablecards[4]->name << endl;
     cout << "\n" << endl;
 
-    CombinedHand ch = CombinedHand();
-    ch = Combine(table, playerlist[0]);
+    //  Can dynamically create player variables at the very end of this project
+    CombinedHand chp1 = CombinedHand();
+    chp1 = Combine(table, playerlist[0]);
     for (int i = 0; i < 7; i++) {
-        cout << ch.combinedcards[i]->name << endl;
+        cout << chp1.combinedcards[i]->name << endl;
 	}
-	//cout << ch.combinedcards[0]->name << endl;
-    
-    vector<int> result = Quantity(ch);
+
+    vector<int> flush = is_flush(chp1);
+    vector<int> straight = is_straight(chp1);
+    vector<int> combs = combinations(chp1);
 
     // Check the size of the result vector to determine how many values to display
-    int resultSize = result.size();
-    for (int i = 0; i < resultSize; i++) {
-    cout << result[i] << " ";
+    int flushSize = flush.size();
+    for (int i = 0; i < flushSize; i++) {
+    cout << flush[i] << " ";
     }
     cout << endl;  
+
+    int straightSize = straight.size();
+    for (int i = 0; i < straightSize; i++) {
+    cout << straight[i] << " ";
+    }
+    cout << endl;  
+
+    int combsSize = combs.size();
+    for (int i = 0; i < combsSize; i++) {
+    cout << combs[i] << " ";
+    }
+    cout << endl;  
+
 }
